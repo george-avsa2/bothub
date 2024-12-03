@@ -1,0 +1,304 @@
+openapi: 3.0.0
+info:
+  title: User API
+  version: 1.0.0
+  description: API для управления пользователями и моделями.
+paths:
+  /users:
+    post:
+      summary: Создать пользователя
+      description: Создает нового пользователя с указанными данными.
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstname:
+                  type: string
+                  example: 'John'
+                lastname:
+                  type: string
+                  example: 'Doe'
+                password:
+                  type: string
+                  format: password
+                  example: 'securePassword123'
+              required:
+                - firstname
+                - lastname
+                - password
+      responses:
+        '201':
+          description: Успешное создание пользователя
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: '123e4567-e89b-12d3-a456-426614174000'
+                  firstname:
+                    type: string
+                    example: 'John'
+                  lastname:
+                    type: string
+                    example: 'Doe'
+        '400':
+          description: Ошибка валидации данных
+    patch:
+      summary: Обновить баланс пользователя
+      description: Обновляет баланс пользователя и возвращает обновленный объект пользователя.
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: '123e4567-e89b-12d3-a456-426614174000'
+                balance:
+                  type: number
+                  format: float
+                  example: 100.50
+              required:
+                - id
+                - balance
+      responses:
+        '200':
+          description: Успешное обновление баланса. Возвращает обновленный объект пользователя.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: '123e4567-e89b-12d3-a456-426614174000'
+                  firstname:
+                    type: string
+                    example: 'John'
+                  lastname:
+                    type: string
+                    example: 'Doe'
+                  balance:
+                    type: number
+                    format: float
+                    example: 200.75
+        '401':
+          description: Неавторизован. Bearer-токен отсутствует или недействителен.
+        '400':
+          description: Ошибка валидации данных
+  /users/authenticate:
+    post:
+      summary: Аутентификация пользователя
+      description: Аутентифицирует пользователя по `id` и `password` и возвращает Bearer токен.
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: '123e4567-e89b-12d3-a456-426614174000'
+                password:
+                  type: string
+                  format: password
+                  example: 'securePassword123'
+              required:
+                - id
+                - password
+      responses:
+        '200':
+          description: Успешная аутентификация. Возвращает Bearer токен.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: 'Bearer eyJhbGciOiJIUzI1NiIsInR...'
+        '401':
+          description: Неверный `id` или `password`.
+        '400':
+          description: Ошибка валидации данных.
+  /models:
+    post:
+      summary: Создать новую модель
+      description: Создает новую модель с указанными данными.
+      tags:
+        - Models
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: 'Example Model'
+                costPer100Tokens:
+                  type: number
+                  format: float
+                  example: 0.10
+                apiToken:
+                  type: string
+                  example: 'api-token-example'
+                apiUrl:
+                  type: string
+                  example: 'https://api.example.com'
+              required:
+                - name
+                - costPer100Tokens
+                - apiToken
+                - apiUrl
+      responses:
+        '201':
+          description: Модель успешно создана.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: '123e4567-e89b-12d3-a456-426614174000'
+                  name:
+                    type: string
+                    example: 'Example Model'
+                  costPer100Tokens:
+                    type: number
+                    format: float
+                    example: 0.10
+                  apiToken:
+                    type: string
+                    example: 'api-token-example'
+                  apiUrl:
+                    type: string
+                    example: 'https://api.example.com'
+        '400':
+          description: Ошибка валидации данных.
+  /models/{id}:
+    get:
+      summary: Получить модель по ID
+      description: Возвращает объект модели по ID.
+      tags:
+        - Models
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: '123e4567-e89b-12d3-a456-426614174000'
+          description: Уникальный идентификатор модели.
+      responses:
+        '200':
+          description: Успешный ответ. Возвращает объект модели.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: '123e4567-e89b-12d3-a456-426614174000'
+                  name:
+                    type: string
+                    example: 'Example Model'
+                  costPer100Tokens:
+                    type: number
+                    format: float
+                    example: 0.10
+                  apiToken:
+                    type: string
+                    example: 'api-token-example'
+                  apiUrl:
+                    type: string
+                    example: 'https://api.example.com'
+        '404':
+          description: Модель не найдена.
+        '401':
+          description: Неавторизован. Bearer-токен отсутствует или недействителен.
+  /models/{id}/stream:
+    post:
+      summary: Отправить запрос в модель
+      description: Отправляет запрос в модель и получает ответ. Требуется передать `payload`.
+      tags:
+        - Models
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: '123e4567-e89b-12d3-a456-426614174000'
+          description: Уникальный идентификатор модели.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payload:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                        example: 'user'
+                      content:
+                        type: string
+                        example: 'Как создать новую модель?'
+                  example:
+                    - role: 'user'
+                      content: 'Как создать новую модель?'
+              required:
+                - payload
+      responses:
+        '200':
+          description: Успешный запрос. Возвращает ответ от модели.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: string
+                    example: 'Вот как можно создать модель.'
+        '400':
+          description: Ошибка в запросе.
+        '401':
+          description: Неавторизован. Bearer-токен отсутствует или недействителен.
+        '404':
+          description: Модель не найдена.
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
